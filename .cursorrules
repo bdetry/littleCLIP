@@ -1,0 +1,50 @@
+# CRITICAL : NO PHYSICAL LINK OR ANY DEPENDECY SHOULD EXIST BETWEEN THE SYSTEM AND THE AGENTS IN /AGENTS FOLDER
+THEY EXCHANGE VIA THE CONSOLE LOGS ONLY 
+
+# Minimalist Architecture Rules
+- Use `spawn` for execution to allow real-time `stdout` streaming to the UI.
+- All database interactions should be via a single `tasks` table. 
+- Prioritize "STDOUT Parsing": Assume the agent might print non-JSON text; use a parser that finds the `{` and `}` boundaries.
+- The UI should focus on the "Task Log" and "Cost Per Agent." task execution logging
+- Keep the Next.js server actions simple: `createTask`, `updateTask`, `runTask`.
+
+
+# Core-Ledger: Professional Development Standards
+
+## 1. Code Quality
+- Use TypeScript for everything. No `any`. 
+- Follow a "Functional Core, Imperative Shell" pattern. Keep logic in pure functions; keep side effects (DB, CLI) in dedicated service files.
+- Use Drizzle ORM for all SQLite interactions to ensure schema-to-TypeScript safety.
+
+## 2. The Agent Contract
+- Agents MUST output a final JSON object. 
+- Schema: `{ "output": string, "cost": number, "next_tasks": Task[] }`.
+- Logic for parsing STDOUT: Use a robust regex to find the outermost JSON object in the stream to prevent failure due to debug logs.
+
+## 3. UI/UX Principles
+- **Density over White Space:** The dashboard should look like a professional tool (e.g., Vercel, Linear).
+- **Immediate Feedback:** Use Optimistic Updates for task status changes.
+- **Error Visibility:** If a script fails, display the `stderr` in a code-formatted modal attached to the task card.
+
+## 4. Execution Engine
+- Use `spawn` rather than `exec` to prevent buffer overflows and allow real-time streaming.
+- Implement a 60-second timeout default for all agent executions to prevent zombie processes.
+
+
+# Development Standards
+
+## 1. Minimalist Philosophy
+- Every agent is just a command. Never implement "Agent Registries" or "Model Adapters."
+- The `assignee_cmd` is the ONLY configuration needed to run an agent.
+- Use `node:child_process` `spawn` to stream logs. Never use `exec` (prevents memory issues with large logs).
+
+## 2. The JSON Contract
+- Agents MUST output valid JSON to be considered "successful."
+- System must use Regex to find the LAST valid JSON object in a stream: `/({[\s\S]*})/g`.
+- Required JSON fields: `output`, `cost`. Optional: `next_tasks`.
+
+## 3. Tech Stack Professionalism
+- Use **Drizzle ORM** with **Zod** for schema validation.
+- Use **Server Actions** for task updates (Optimistic UI updates).
+- UI must be "Dev-Tool" aesthetic: Dark mode, monospace fonts for logs, Shadcn/UI.
+

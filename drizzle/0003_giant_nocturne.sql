@@ -1,0 +1,1 @@
+ALTER TABLE `agents` ADD `retrigger_parent` integer DEFAULT false NOT NULL;

@@ -1,0 +1,1 @@
+ALTER TABLE `agents` ADD `max_chain_calls_per_minute` integer;
